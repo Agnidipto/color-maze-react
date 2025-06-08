@@ -1,7 +1,10 @@
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Cells from "../Cells";
 import { solvePuzzle } from "../../utils";
 import { setSolution as setSolutionAction} from "../../redux/appSlice";
+import { DIRECTION_MAPPING } from "../../constants";
+import { movePlayer as movePlayerAction} from "../../redux/appSlice";
 
 function PlayGame(props) {
 
@@ -12,6 +15,23 @@ function PlayGame(props) {
 
   const dispatch = useDispatch();
   const setSolution = (value) => dispatch(setSolutionAction(value));
+  const movePlayer = (value) => dispatch(movePlayerAction(value));
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+        const direction = e.key.toLowerCase();
+        if (DIRECTION_MAPPING[direction]) {
+            e.preventDefault();
+            movePlayer(direction);
+        }
+    };
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+    };
+}, []); // dispatch is stable, movePlayerAction is stable
 
   return (<>
     {board.length > 0 && (
